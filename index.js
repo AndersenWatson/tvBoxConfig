@@ -20,7 +20,13 @@ const getOpenSourceConfig = {
   },
   live: {
     githubUrl: 'https://github.com/fanmingming/live',
-    infoUrl: 'https://fanmingming.com/txt?url=https://live.fanmingming.com/tv/m3u/global.m3u',
+    infoUrl: [{
+      name: 'ipv4',
+      url: 'https://fanmingming.com/txt?url=https://live.fanmingming.com/tv/m3u/global.m3u'
+    }, {
+      name: 'ipv6',
+      url: 'https://fanmingming.com/txt?url=https://live.fanmingming.com/tv/m3u/ipv6.m3u'
+    }],
     epgUrl: 'https://live.fanmingming.com/e.xml?ch={name}&date={date}', // 预告EPG
     logoUrl: 'https://live.fanmingming.com/tv/{name}.png',
   },
@@ -63,21 +69,54 @@ const handleInitData = () => {
         }
         // 设置壁纸
         responseData.wallpaper = getOpenSourceConfig?.wallpaper ?? ''
-        // 设置直播
-        responseData.lives = [{
-          name: '直播',
-          type: 0,
-          url: './dist/lives.txt',
-          epg: getOpenSourceConfig?.live?.epgUrl ?? '',
-          logo: getOpenSourceConfig?.live?.logoUrl ?? '',
-        }, ]
+
         req.end()
         handleSpiderFile(responseData)
           .then((res) => {
-            return handleWriteFile('dist/data.json', JSON.stringify(res))
+            // 设置直播
+            // 之前会把网络的数据克隆下载在本地,
+            // 但是发现如果源发生了改变则只能重新获取
+            // 因为目前打算不进行存储本地直播流(但本地直播源未移除)
+            if (getOpenSourceConfig.live.infoUrl instanceof Array) {
+              // 文件名称使用数字序号防止改动大或忘记
+              const apis = getOpenSourceConfig.live.infoUrl?.map((item, index) => {
+                responseData.lives = [{
+                  name: '直播',
+                  type: 0,
+                  url: item.url,
+                  epg: getOpenSourceConfig?.live?.epgUrl ?? '',
+                  logo: getOpenSourceConfig?.live?.logoUrl ?? '',
+                }]
+                return handleWriteFile('dist/data' + (index ? index : '') + '.json', JSON.stringify(
+                  res))
+              })
+              return Promise.all([...apis])
+            } else {
+              responseData.lives = [{
+                name: '直播',
+                type: 0,
+                url: getOpenSourceConfig.live.infoUrl,
+                epg: getOpenSourceConfig?.live?.epgUrl ?? '',
+                logo: getOpenSourceConfig?.live?.logoUrl ?? '',
+              }]
+              return handleWriteFile('dist/data.json', JSON.stringify(res))
+            }
           })
           .then(() => {
-            return handleInitLive() // 获取直播流
+
+            // 直播源可能有多个
+            if (getOpenSourceConfig.live.infoUrl instanceof Array) {
+              const apis = getOpenSourceConfig.live.infoUrl?.map(item => {
+                return handleInitLive(item)
+              })
+              return Promise.all([...apis])
+            } else {
+              return handleInitLive({
+                name: 'lives',
+                url: getOpenSourceConfig.live.infoUrl
+              }) // 获取直播流
+            }
+
           }).then(() => {
             resolve()
           }).catch(() => {
@@ -92,9 +131,10 @@ const handleInitData = () => {
   })
 }
 // 获取开源数据
-const handleInitLive = () => {
+// params => params
+const handleInitLive = (params) => {
   return new Promise((resolve, reject) => {
-    const req = https.get(getOpenSourceConfig.live.infoUrl, (res) => {
+    const req = https.get(params.url, (res) => {
       res.setEncoding('utf8')
       let responseData = ''
       res.on('data', (data) => {
@@ -105,7 +145,7 @@ const handleInitLive = () => {
         setNewConfig.tipArr.push('获取直播源成功')
         req.end()
         // 现在有提供:M3U To TXT,
-        handleWriteFile('dist/lives.txt', responseData).then(() => {
+        handleWriteFile('dist/' + params.name + '.txt', responseData).then(() => {
           setNewConfig.tipArr.push('当前时间:' + setNewConfig.time)
           resolve()
         }).catch(() => {
@@ -234,7 +274,9 @@ const handleWriteFile = (name, data) => {
   return new Promise((resolve, reject) => {
     const filePath = './' + name
     const content = data
-    fs.writeFile(filePath, content, (err) => {
+    fs.writeFile(filePath, content, {
+      encoding: "utf8",
+    }, (err) => {
       if (err) {
         setNewConfig.tipArr.push('文件创建失败:' + name)
         setNewConfig.tipArr.push('文件错误信息:' + err)
@@ -262,6 +304,10 @@ setNewConfig.app.get('/getTvBoxConfig', (req, res) => {
     res.send(showHtml);
   })
 });
+
+
+
+
 
 // 开启服务
 setNewConfig.app.listen(setNewConfig.port, () => {
