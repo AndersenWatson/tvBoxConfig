@@ -18,7 +18,7 @@ CCTV-15 音乐,http://cntv.lat/tv/live.php?auth=231110&id=cctv15HD
 CCTV-16 奥林匹克,http://cntv.lat/tv/live.php?auth=231110&id=cctv16HD
 CCTV-17 农业农村,http://cntv.lat/tv/live.php?auth=231110&id=cctv17HD
 CCTV-4K 超高清,http://cntv.lat/tv/live.php?auth=231110&id=CCTV4K
-CCTV-16 4K,http://cntv.lat/tv/live.php?auth=231110&id=CCTV16_4K
+CCTV-16 奥林匹克 4K,http://cntv.lat/tv/live.php?auth=231110&id=CCTV16_4K
 CHC动作电影,http://cntv.lat/tv/live.php?auth=231110&id=chcdzdyHD
 CHC家庭影院,http://cntv.lat/tv/live.php?auth=231110&id=chcjtyyHD
 CHC高清电影,http://cntv.lat/tv/live.php?auth=231110&id=chcgqdyHD
@@ -143,15 +143,16 @@ CETV-4,http://cntv.lat/tv/live.php?auth=231110&id=cetv-4SD
 重庆汽摩,http://cntv.lat/tv/live.php?auth=231110&id=cqcarSD
 重庆移动,http://cntv.lat/tv/live.php?auth=231110&id=mryyHD
 重广融媒,http://cntv.lat/tv/live.php?auth=231110&id=cqrongmei
+上海新闻综合,https://pi.0472.org/tv/sh.php?id=xw
+上海都市,https://pi.0472.org/tv/sh.php?id=ds
 
 港澳,#genre#
-凤凰中文,http://180.97.247.27/1301-tx.otvstream.otvcloud.com/otv/skcc/live/channel52003/index.m3u8
-凤凰资讯,http://180.97.247.27/1301-tx.otvstream.otvcloud.com/otv/skcc/live/channel52002/index.m3u8
 翡翠台,https://pi.0472.org/tv/fct.php?auth=231110
 明珠台,https://pi.0472.org/tv/mzt.php?auth=231110
 澳视澳门,https://pi.0472.org/tv/asam.php?auth=231110
 星空卫视,https://pi.0472.org/tv/startv.php?auth=231110
 澳亚卫视,https://pi.0472.org/tv/aoya.php?auth=231110
+耀才财经,https://v3.mediacast.hk/webcast/bshdlive-pc/playlist.m3u8
 香港卫视,http://zhibo.hkstv.tv/livestream/mutfysrq/playlist.m3u8
 莲花卫视,https://cntv.lat/tv/lhws.php
 人间卫视,http://61.216.67.119:1935/bltvhd/bltv1/chunklist_w1266569526.m3u8
@@ -199,7 +200,6 @@ FASHIONTV 4K,https://fash2043.cloudycdn.services/slive/ftv_ftv_4k_hevc_73d_42080
 越·HBTV,http://hoabinhtvlive.746b3ddb.cdnviet.com/hoabinhtv/playlist.m3u8
 越·ANTV,http://antvlive.ab5c6921.cdnviet.com/antv/chunklist.m3u8
 番薯,http://61.216.67.119:1935/TWHG/E1/chunklist_w705811302.m3u8
-耀才财经,http://202.69.67.66:443/webcast/bshdlive-pc/playlist.m3u8
 ABC新闻,http://cms-wowza.lunabyte.io/wbrz-live-1/_definst_/smil:wbrz-live.smil/chunklist_b1300000.m3u8
 NewsmaxTV,http://nmxlive.akamaized.net/hls/live/529965/Live_1/index.m3u8
 PBS America,https://pbs-samsunguk.amagi.tv/playlist.m3u8
@@ -215,3 +215,4 @@ Astrakhan24,http://streaming.astrakhan.ru/astrakhan24/index.m3u8
 长城精品,http://38.64.72.148:80/hls/modn/list/4008/chunklist1.m3u8
 香港佛陀,https://js1.amtb.cn/liveedge/_definst_/livetv/playlist.m3u8
 VB,http://live.tv2bornholm.dk/stream/live/chunklist.m3u8
+

@@ -5,11 +5,27 @@
  */
 const https = require('https')
 const fs = require('fs')
-const json5 = require('./utils/json5.js')
 const express = require('express');
+const json5 = require('./utils/json5.js')
+const base64 = require('./utils/base64.js')
+// 时间
+const currentDate = new Date()
+const currentDateStr = currentDate.getFullYear() +
+  '-' +
+  (currentDate.getMonth() + 1).toString().padStart(2, '0') +
+  '-' +
+  currentDate.getDate().toString().padStart(2, '0') +
+  ' ' +
+  currentDate.getHours().toString().padStart(2, '0') +
+  ':' +
+  currentDate.getMinutes().toString().padStart(2, '0') +
+  ':' +
+  currentDate.getSeconds().toString().padStart(2, '0')
+
+
 // 开源仓库配置
 const getOpenSourceConfig = {
-  wallpaper: 'https://bing.img.run/rand.php',
+  wallpaper: 'https://bing.img.run/rand.php?timestamp=' + currentDateStr.replaceAll(' ', '~'),
   image: {
     github: 'https://kkgithub.com',
     githubRaw: 'https://raw.kkgithub.com',
@@ -31,20 +47,10 @@ const getOpenSourceConfig = {
     logoUrl: 'https://live.fanmingming.com/tv/{name}.png',
   },
 }
+
 // 设置新配置
-const currentDate = new Date()
 const setNewConfig = {
-  time: currentDate.getFullYear() +
-    '-' +
-    (currentDate.getMonth() + 1).toString().padStart(2, '0') +
-    '-' +
-    currentDate.getDate().toString().padStart(2, '0') +
-    ' ' +
-    currentDate.getHours().toString().padStart(2, '0') +
-    ':' +
-    currentDate.getMinutes().toString().padStart(2, '0') +
-    ':' +
-    currentDate.getSeconds().toString().padStart(2, '0'),
+  time: currentDateStr,
   app: express(),
   port: 80,
   tipArr: []
@@ -87,6 +93,19 @@ const handleInitData = () => {
                   epg: getOpenSourceConfig?.live?.epgUrl ?? '',
                   logo: getOpenSourceConfig?.live?.logoUrl ?? '',
                 }]
+                // 如果不是本地地址,则需要添加数据
+                if (item.url.indexOf('http') !== -1) {
+                  const jsonObj = {
+                    "group": "redirect",
+                    "channels": [{
+                      "name": "redirect",
+                      "urls": [
+                        "proxy://do=live&type=txt&ext=" + base64.encryptBase64(item.url)
+                      ]
+                    }]
+                  }
+                  responseData.lives.push(jsonObj)
+                }
                 return handleWriteFile('dist/data' + (index ? index : '') + '.json', JSON.stringify(
                   res))
               })
@@ -142,7 +161,7 @@ const handleInitLive = (params) => {
       })
 
       res.on('end', (e) => {
-        setNewConfig.tipArr.push('获取直播源成功')
+        setNewConfig.tipArr.push('获取直播源' + params.name + '成功')
         req.end()
         // 现在有提供:M3U To TXT,
         handleWriteFile('dist/' + params.name + '.txt', responseData).then(() => {
@@ -154,7 +173,7 @@ const handleInitLive = (params) => {
       })
     })
     req.on('error', (e) => {
-      setNewConfig.tipArr.push('获取直播源失败')
+      setNewConfig.tipArr.push('获取直播源' + params.name + '失败')
       // 若是以后直播源成功但是转txt失败则可以进行以下尝试
       // 先调用直播源后使用handleLivesData(responseData)处理
       reject()
@@ -174,7 +193,7 @@ const handleSpiderFile = (responseData) => {
       if (spiderUrl) {
         const filePath = './dist/spider.jar'
         // 设置spider
-        responseData.spider = spiderStr.replaceAll(spiderUrl, filePath)
+        responseData.spider = spiderStr.replaceAll(spiderUrl, './spider.jar')
         // 需要检测是网址还是相对路径或是绝对路径
         let spiderDownloadUrl = ''
         if (spiderUrl.indexOf('http') === 0) {
